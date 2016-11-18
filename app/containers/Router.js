@@ -7,36 +7,92 @@ import Login from './Login'
 import Posts from './Posts'
 import Random from './Random'
 
-/**
- * !!! react-native-router-flux tips !!
- *  - A higher-level "tabs" scene should wrap the tab scenes
- *  - you can pass arbitrary props to a Scene by giving it the prop "passProps={true}"
- */
-
-// This is for the "icon" prop on tabe Scenes
-class TabIcon extends Component {
-    render(){
-      // Render the title of the tab here
-      return null
+const styles = StyleSheet.create({
+    tabBar: {
+        borderTopWidth: 0.5,
+        borderColor: '#b7b7b7',
+        backgroundColor: '#fff',
+        opacity: 1
+    },
+    page: {
+        paddingTop: 64
+    },
+    tabIcon: {
+        color: 'black',
+    },
+    selectedTabIcon: {
+        color: 'red'
     }
+})
+
+const TabIcon = ({title, selected}) => {
+    let style = selected ? styles.selectedTabIcon : styles.tabIcon;
+
+    return (
+        <Text style={style}>{title}</Text>
+    );
 }
 
 class AppRouter extends Component {
-  render() {
+    render() {
+   	    return (
+            <Router>
+                <Scene key="root">
+                    <Scene
+                        key="tabs"
+                        hideNavBar={true}
+                        tabs={true}
+                        tabBarStyle={styles.tabBar}
+                        direction="vertical"
+                    >
+                        <Scene
+                            key="postsTab"
+                            title="Feed"
+                            icon={TabIcon}
+                            style={styles.page}
+                        >
+                            <Scene
+                                key="posts"
+                                component={Posts}
+                                subreddit="hot"
+                                title="Reddit Posts"
+                                passProps={true}
+                            />
+                        </Scene>
 
-    // Return <Router> and <Scenes> here
-   	return null
-  }
+                        <Scene
+                            key="randomTab"
+                            title="Random"
+                            icon={TabIcon}
+                            style={styles.page}
+                        >
+                            <Scene
+                                key="random"
+                                component={Random}
+                                subreddit="random"
+                                title="Reddit Random"
+                                passProps={true}
+                            />
+                        </Scene>
+                    </Scene>
+
+                    <Scene
+                        key="login"
+                        title="Login"
+                        direction="vertical"
+                        initial={true}
+                    >
+                        <Scene
+                            key="loginContent"
+                            title="Login"
+                            component={Login}
+                            style={styles.page}
+                        />
+                    </Scene>
+                </Scene>
+            </Router>
+        )
+    }
 }
-
-// Feel free to use this style, or create your own
-let styles = StyleSheet.create({
-  tabBar: {
-    borderTopWidth: 0.5,
-    borderColor: '#b7b7b7',
-    backgroundColor: '#fff',
-    opacity: 1
-  }
-})
 
 export default connect()(AppRouter)
