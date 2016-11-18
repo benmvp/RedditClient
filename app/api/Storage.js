@@ -17,7 +17,7 @@ const EXPIRATION_TIME = 30 * 60 * 100
  */
 
 const _isExpired = (time) => (
-    (Date.now - time) > EXPIRATION_TIME
+    (Date.now() - time) > EXPIRATION_TIME
 )
 const _getTokenInfo = async () => (
     await (
@@ -39,7 +39,7 @@ export const setToken = async (token) => (
 export const getToken = async () => (
     await (
         _getTokenInfo()
-            .then(({token}) => token)
+            .then((tokenInfo) => tokenInfo && tokenInfo.token)
     )
 )
 
@@ -50,6 +50,6 @@ export const clearToken = async () => (
 export const tokenHasExpired = async () => {
     await (
         _getTokenInfo()
-            .then(({expires}) => _isExpired(expires))
+            .then((tokenInfo) => tokenInfo && _isExpired(tokenInfo.expires))
     )
 }

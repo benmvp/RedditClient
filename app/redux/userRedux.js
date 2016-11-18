@@ -10,7 +10,7 @@ const authenticationSuccess = (token) => {
     setToken(token)
 
     return {
-        type: AUTHENTICATION_SUCCESS,
+        type: TYPES.AUTHENTICATION_SUCCESS,
         payload: {token}
     }
 }
@@ -24,7 +24,7 @@ const startAuthentication = () => async (dispatch) => {
     }
 
     if (token && !isTokenExpired) {
-        return dispatch(actionCreators.authenticationSuccess)
+        return dispatch(actionCreators.authenticationSuccess(token))
     }
 
     // not saved locally so need to go get it
