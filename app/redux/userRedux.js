@@ -16,20 +16,19 @@ const authenticationSuccess = (token) => {
 }
 
 const startAuthentication = () => async (dispatch) => {
+    let token = await getToken()
     let isTokenExpired = await tokenHasExpired()
 
     if (isTokenExpired) {
         clearToken()
     }
 
-    let token = await getToken()
-
     if (token && !isTokenExpired) {
         return dispatch(actionCreators.authenticationSuccess)
     }
 
     // not saved locally so need to go get it
-    dispatch({
+    return dispatch({
         type: TYPES.AUTHENTICATION_PENDING
     })
 }
