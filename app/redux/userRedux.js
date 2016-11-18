@@ -1,34 +1,85 @@
 import { setToken, getToken, clearToken, tokenHasExpired } from '../api/Storage'
 
-/**
- * This works because of our redux-thunk middleware in ./store/configureStore
- *
- * ...action creators that return a function instead of an action.
- * The thunk can be used to delay the dispatch of an action,
- * or to dispatch only if a certain condition is met.
- * The inner function receives the functions dispatch and getState as parameters.
- */
-const startAuthentication = () => async (dispatch, getState) => {
-  // you'll want to use an async function for this call to eventually
-  // be able to "await" the getToken call from AsyncStorage
+const TYPES = {
+    AUTHENTICATION_PENDING: 'AUTHENTICATION_PENDING',
+    AUTHENTICATION_SUCCESS: 'AUTHENTICATION_SUCCESS',
+    AUTHENTICATION_FAILURE: 'AUTHENTICATION_FAILURE',
 }
 
+const authenticationSuccess = (token) => {
+    setToken(token)
+
+    return {
+        type: AUTHENTICATION_SUCCESS,
+        payload: {token}
+    }
+}
+
+const startAuthentication = () => async (dispatch) => {
+    let isTokenExpired = await tokenHasExpired()
+
+    if (isTokenExpired) {
+        clearToken()
+    }
+
+    let token = await getToken()
+
+    if (token && !isTokenExpired) {
+        return dispatch(actionCreators.authenticationSuccess)
+    }
+
+    // not saved locally so need to go get it
+    dispatch({
+        type: TYPES.AUTHENTICATION_PENDING
+    })
+}
+
+const authenticationFailure = (error) => ({
+    type: TYPES.AUTHENTICATION_FAILURE,
+    error,
+})
+
 export const actionCreators = {
-  startAuthentication,
-  // add the other action creators
+    startAuthentication,
+    authenticationSuccess,
+    authenticationFailure,
 }
 
 const initialState = {
-  //setup initialState
+    isAuthenticating: false,
+    token: null,
+    error: null,
 }
 
 export const reducer = (state = initialState, action) => {
-  const {type, payload} = action
+    let {type, payload, error} = action
 
-  switch(type) {
-    // update state here
-    default: {
-      return state
+    if (type === TYPES.AUTHENTICATION_PENDING) {
+        return {
+            ...state,
+            isAuthenticating: true,
+            token: null,
+            error: null,
+        }
     }
-  }
+
+    if (type === TYPES.AUTHENTICATION_SUCCESS) {
+        return {
+            ...state,
+            isAuthenticating: false,
+            token: payload.token,
+            error: null,
+        }
+    }
+
+    if (type === TYPES.AUTHENTICATION_FAILURE) {
+        return {
+            ...state,
+            isAuthenticating: false,
+            token: null,
+            error
+        }
+    }
+
+    return state
 }
