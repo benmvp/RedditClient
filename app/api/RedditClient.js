@@ -1,12 +1,16 @@
-export default class RedditClient {
-  // this is so you don't have to read Reddits API documentation
-  constructor(token) {
-    this.baseUrl = 'https://oauth.reddit.com/'
-    this.defaultHeaders = {
-        'Authorization': `bearer ${token}`,
-    }
-  }
-  
-  // use "fetch" to retrieve data from endpoints on the above baseUrl and add the defaultHeaders to your request
+const BASE_URL = 'https://oauth.reddit.com/'
 
-}
+const _fetch = (url, token) => (
+    fetch(url, {
+        headers: {
+            'Authorization': `bearer ${token}`,
+        }
+    })
+        .then((response) => response.json())
+)
+
+export const getPosts = async (subreddit, token) => (
+    await _fetch(`${BASE_URL}/${subreddit}`, token)
+)
+
+export const getRandom = getPosts.bind(null, 'random')

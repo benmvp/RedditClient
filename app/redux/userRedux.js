@@ -24,7 +24,7 @@ const startAuthentication = () => async (dispatch) => {
     }
 
     if (token && !isTokenExpired) {
-        return dispatch(actionCreators.authenticationSuccess(token))
+        return dispatch(authenticationSuccess(token))
     }
 
     // not saved locally so need to go get it
